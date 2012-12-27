@@ -13,7 +13,9 @@ SUCCESSFUL_ACTION = 1
 IMPROPER_FILE_ERROR = 2
 FILE_CREATION_ERROR = 3
 
-# post file to hastebin
+# post file to hastebin.
+# returns hastebin_key if successful;
+# returns error code otherwise
 def post(signifier):
 	try:
 		contents = {file: open(file).read() for file in signifier}
@@ -33,9 +35,11 @@ def post(signifier):
 	request = urllib2.Request(POST_URL, payload)
 	response = urllib2.urlopen(request).read()
 	hastebin_key = json.loads(response)['key']
-	print "Sucessfully posted to " + HASTE_URL + hastebin_key
-	return SUCCESSFUL_ACTION
-	
+	return hastebin_key
+
+# downloads files from a given hastebin key
+# returns a list of the filenames downloaded if successful;
+# returns error code otherwise	
 def get(signifier):
 	
 	# Gross way of flattening the list to a string;
@@ -53,6 +57,8 @@ def get(signifier):
 	
 	# Create some files!
 	number_of_files = len(unsorted_contents) / 2
+	successful_files = []
+	
 	for file_index in range(number_of_files):
 		file_name = unsorted_contents[file_index * 2]
 		file_content = unsorted_contents[file_index * 2 + 1][1:]
@@ -68,7 +74,9 @@ def get(signifier):
 		file_pointer = open(target_location + file_name, 'w')
 		file_pointer.write(file_content)
 		file_pointer.close()
-		print "Successfully wrote " + file_name
+		successful_files.append(file_name)
+	
+	return successful_files
 			
 
 def main(argv=None):
@@ -97,6 +105,8 @@ def main(argv=None):
 			print "Able to download file but not write it to disk."
 			return 0
 		else:
+			print "Success!"
+			print result
 			return 1
 
 if __name__ == '__main__':
