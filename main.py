@@ -16,12 +16,13 @@ FILE_CREATION_ERROR = 3
 # post file to hastebin
 def post(signifier):
 	try:
-		contents = {file: open(file).read() for file in signifier}	
+		contents = {file: open(file).read() for file in signifier}
+	
+	# The main thing that I've ran into is file not existing	
 	except IOError:
 		return IMPROPER_FILE_ERROR
 		
 	payload = ''
-	
 	for header in contents:
 		payload += '\n' + FILE_DELINEATOR + header + FILE_DELINEATOR + '\n'
 		payload += contents[header]
@@ -56,19 +57,19 @@ def get(signifier):
 		file_name = unsorted_contents[file_index * 2]
 		file_content = unsorted_contents[file_index * 2 + 1][1:]
 		
-		# if there's a target location, use it
+		# Edge case that I haven't worked with too much
 		target_location = './'
 		if len(signifier) > 1:
 			target_location = signifier[1]
 			
 			if target_location[-1] != '/':
 				target_location += '/'
+				
 		file_pointer = open(target_location + file_name, 'w')
 		file_pointer.write(file_content)
 		file_pointer.close()
 		print "Successfully wrote " + file_name
 			
-	
 
 def main(argv=None):
 	if argv is None:
@@ -88,6 +89,15 @@ def main(argv=None):
 			'post': post,
 			'get': get
 		}[command](signifier)
+		
+		if result == IMPROPER_FILE_ERROR:
+			print "Unable to upload file. Be sure to make sure it exists!"
+			return 0
+		elif result == FILE_CREATION_ERROR:
+			print "Able to download file but not write it to disk."
+			return 0
+		else:
+			return 1
 
 if __name__ == '__main__':
 	sys.exit(main())
