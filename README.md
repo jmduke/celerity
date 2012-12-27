@@ -25,6 +25,10 @@ You can post multiple files simultaneously by simply listing them, such as:
 
     celerity post fileone.py filetwo.py
     
+And you can even pipe input to celerity:
+    
+    ls | celerity post
+    
 And to retrieve a hastebin:
 
     celerity get <id> [<target>]
